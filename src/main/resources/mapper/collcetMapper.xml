@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.CollectDao">
+
+
+    <resultMap id="collectConditionMap" type="com.kxj.bigscreen.model.CollectCondition">
+        <id property="departmentId" column="department_id"></id>
+        <result property="department" column="department"></result>
+        <result property="tableAmount" column="table_amount"></result>
+        <result property="dataItem" column="data_item"></result>
+        <result property="amount" column="amount"></result>
+        <result property="type" column="type"></result>
+        <result property="joinDate" column="join_date"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findDe" resultMap="collectConditionMap">
+        SELECT
+part1.department_id,
+ part2.department,
+ part1.table_amount
+FROM
+ ( SELECT department_id, table_amount ,
+ ROW_NUMBER() OVER(PARTITION by (department_id) ORDER BY "update_time" DESC) AS rw
+ FROM "DAMA"."dm".collect_condition ) part1
+ LEFT JOIN "DAMA"."dm".department part2 ON part1.department_id = part2.department_id where part1.rw=1;
+    </select>
+
+    <select id="findData" resultMap="collectConditionMap">
+        SELECT
+part1.department_id,
+ part2.department,
+ part1.data_item,
+ part1.amount,
+part1.type ,
+part1.join_date
+
+FROM
+ ( SELECT department_id, data_item,type ,round(amount /10000.00, 0) amount ,join_date ,
+ ROW_NUMBER() OVER(PARTITION by (department_id) ORDER BY "update_time" DESC) AS rw
+ FROM "DAMA"."dm".collect_condition ) part1
+ LEFT JOIN "DAMA"."dm".department part2 ON part1.department_id = part2.department_id where part1.rw=1 and part1.department_id=#{departmentId}
+    </select>
+    <resultMap id="chartMap" type="com.kxj.bigscreen.model.CharMap">
+        <result property="department" column="department"></result>
+        <result property="departmentId" column="department_id"></result>
+        <collection property="chart" javaType="java.util.List" resultMap="chart"></collection>
+    </resultMap>
+    <resultMap id="chart" type="com.kxj.bigscreen.model.Chart">
+
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+    <select id="findLine" resultMap="chartMap">
+        SELECT
+ part2.department_id,
+ b.department,
+ part2.amount,
+  part2.update_time
+FROM
+ (
+ SELECT
+  department_id,
+  amount,
+  month_tmp,
+  update_time,
+  ROW_NUMBER ( ) OVER ( PARTITION BY department_id, month_tmp ORDER BY update_time DESC ) rn 
+ FROM
+  (
+  SELECT
+   temp1.department_id,
+   temp1.amount,
+   temp1.update_time,
+   temp1.month_tmp 
+  FROM
+   ( SELECT department_id, amount, update_time, substr( update_time :: VARCHAR, 0, 8 ) AS month_tmp FROM "DAMA"."dm".collect_condition
+    WHERE update_time IS NOT NULL ) temp1
+   right JOIN (
+   SELECT
+    substr( update_time :: VARCHAR, 0, 8 ) AS month_tmp 
+   FROM
+    "DAMA"."dm".collect_condition WHERE update_time IS NOT NULL
+   GROUP BY
+    month_tmp 
+   ORDER BY
+    month_tmp DESC 
+    LIMIT 6 
+   ) temp2 ON temp1.month_tmp = temp2.month_tmp 
+
+  ) part1 
+ ) part2,
+ "DAMA"."dm".department b 
+WHERE
+ rn = 1 
+ AND part2.department_id = b.department_id 
+ORDER BY
+ department_id,
+ update_time
+
+    </select>
+    <resultMap id="dataUpdateMap" type="com.kxj.bigscreen.model.DataUpdateCondition">
+        <result property="departmentId" column="department_id"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <resultMap id="dataUpdate" type="com.kxj.bigscreen.model.DataUpdate">
+        <result property="department" column="department"></result>
+        <collection  property="dataUpdateCondition" javaType="java.util.List" resultMap="dataUpdateMap" />
+    </resultMap>
+    <select id="findUpdate" resultMap="dataUpdate">
+        select
+part2.department_id,
+b.department,
+ part2.amount,
+ part2.update_time
+FROM
+ (
+ SELECT
+  department_id,
+  amount,
+  month_tmp,
+  update_time,
+  ROW_NUMBER ( ) OVER ( PARTITION BY department_id, month_tmp ORDER BY update_time DESC ) rn
+ FROM
+  (
+  SELECT
+   temp1.department_id,
+   temp1.amount,
+   temp1.update_time,
+   temp1.month_tmp
+  FROM
+   ( SELECT department_id, amount, update_time, substr( update_time :: VARCHAR, 0, 8 ) AS month_tmp FROM "DAMA"."dm".data_update_condition
+   WHERE update_time IS NOT NULL ) temp1
+   right JOIN (
+   SELECT
+    substr( update_time :: VARCHAR, 0, 8 ) AS month_tmp
+   FROM
+    "DAMA"."dm".data_update_condition WHERE update_time IS NOT NULL
+   GROUP BY
+    month_tmp
+   ORDER BY
+    month_tmp DESC
+    LIMIT 6
+   ) temp2 ON temp1.month_tmp = temp2.month_tmp
+
+  ) part1
+ ) part2,
+ "DAMA"."dm".department b
+WHERE
+ rn = 1
+ AND part2.department_id = b.department_id and part2.department_id =#{departmentId}
+ORDER BY
+ department_id,
+ update_time
+    </select>
+
+    <resultMap id="dataCollectMap" type="com.kxj.bigscreen.model.DataCollect">
+        <result property="sourceAmount" column="source_amount"></result>
+        <result property="tableAmount" column="table_amount"></result>
+        <result property="itemAmount" column="item_amount"></result>
+        <result property="dataAmount" column="data_amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+    
+    <select id="findAmount" resultMap="dataCollectMap">
+        select source_amount , table_amount , item_amount , round(data_amount/10000.00,0) data_amount from "DAMA"."dm".data_collect;
+    </select>
+    
+    <resultMap id="documentMap" type="com.kxj.bigscreen.model.Document">
+        <id property="departmentId" column="department_id"></id>
+        <result property="wordType" column="word_type"></result>
+        <result property="status" column="status"></result>
+    </resultMap>
+
+    <select id="findDocument" resultMap="documentMap">
+        select department_id , word_type , status from "DAMA"."dm".document order by department_id;
+    </select>
+    
+    <resultMap id="timeup" type="com.kxj.bigscreen.model.Time">
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+    <select id="time" resultType="com.kxj.bigscreen.model.Time">
+        select date_id update_time from "DAMA"."dm".dm_table_updatetime
+        <where>
+            <if test="screenId != null and screenId !=''">
+                screen_id =#{screenId}
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="index" type="com.kxj.bigscreen.model.Index">
+        <result property="screenId" column="screen_id"></result>
+        <result property="indexId" column="index_id"></result>
+        <result property="indexName" column="index_name"></result>
+        <result property="indexExplain" column="index_explain"></result>
+    </resultMap>
+
+    <select id="findIndex" resultMap="index">
+        select index_name , index_explain from "DAMA"."dm".index
+        <where>
+            <if test="screenId != null and screenId !=''">
+                screen_id =#{screenId}
+            </if>
+        </where>
+    </select>
+</mapper>

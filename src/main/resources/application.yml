@@ -1,0 +1,61 @@
+server:
+  port: 8082
+
+#spring:
+  #datasource:
+    #url: jdbc:postgresql://222.128.14.106:10286/DAMA?currentSchema=dm?serverTimezone=GMT%2B8&characterEncoding=utf-8
+    #username: postgres
+    #password: xczg123
+    #driver-class-name: org.postgresql.Driver
+spring:
+  datasource:
+    url: jdbc:postgresql://172.24.11.38:5432/DAMA?currentSchema=dm?serverTimezone=GMT%2B8&characterEncoding=utf-8
+    username: postgres
+    password: 1234Aa!
+    driver-class-name: org.postgresql.Driver
+#spring:
+ # datasource:
+  #  url: jdbc:postgresql://172.28.8.141:5432/DAMA?currentSchema=dm?serverTimezone=GMT%2B8&characterEncoding=utf-8
+   # username: postgres
+    #password: xczg
+    #driver-class-name: org.postgresql.Driver
+# 设置上传文件的大小
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1024MB
+      max-request-size: 1000MB
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  typeAliasesPackage: com.example.entity
+  global-config:
+    id-type: 2
+    field-strategy: 0
+    db-column-underline: true
+    refresh-mapper: true
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+
+upload:
+  fileDir: /home/workspace/bigdata-web/web/standard/
+
+logging:
+  level:
+    com.kxj.bigscreen.dao: debug
+
+
+
+#pagehelper分页配置 第二种和第三种不需要 重点讲的第一种需要
+pagehelper:
+  helperDialect: postgresql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+  pageSizeZero: true
+
+# 定位模板的目录
+#spring.mvc.view.prefix: classpath:/templates/
+  # 给返回的页面添加后缀名
+#spring.mvc.view.suffix: .html

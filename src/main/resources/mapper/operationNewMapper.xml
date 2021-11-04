@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.OperationNewDao">
+
+	<resultMap id="standardMap" type="com.kxj.bigscreen.model.StandardMonitor">
+		<result property="step" column="step"></result>
+		<result property="type" column="type"></result>
+		<result property="amount" column="amount"></result>
+		<result property="updateTime" column="update_time"></result>
+	</resultMap>
+	<select id="findClean" resultMap="standardMap">
+        select a.type , a.amount from
+(select id ,type , amount ,step,
+ROW_NUMBER() OVER(PARTITION by (type) ORDER BY date_id DESC) as rn
+from "DAMA"."dm".datamonitor1_standard)a where a.rn=1 and a.step='数据清洗' order by a.id
+    </select><select id="findOptimization" resultMap="standardMap">
+       select a.type , a.amount from
+(select id ,type , amount ,step,
+ROW_NUMBER() OVER(PARTITION by (type) ORDER BY date_id DESC) as rn
+from "DAMA"."dm".datamonitor1_standard)a where a.rn=1 and a.step='数据优化' order by a.id
+    </select><select id="findStandard" resultMap="standardMap">
+        select a.type , a.amount from
+(select id ,type , amount ,step,
+ROW_NUMBER() OVER(PARTITION by (type) ORDER BY date_id DESC) as rn
+from "DAMA"."dm".datamonitor1_standard)a where a.rn=1 and a.step='数据规范' order by a.id
+    </select>
+	<select id="findFuse" resultMap="standardMap">
+        select a.type , a.amount from
+(select id ,type , amount ,step,
+ROW_NUMBER() OVER(PARTITION by (type) ORDER BY date_id DESC) as rn
+from "DAMA"."dm".datamonitor1_standard)a where a.rn=1 and a.step='数据关联融合' order by a.id
+    </select>
+
+    <resultMap id="applicationMap" type="com.kxj.bigscreen.entity.Datamonitor1Application">
+        <result property="leadingUnit" column="leading_unit"></result>
+        <result property="application" column="application"></result>
+        <result property="serviceMode" column="service_mode"></result>
+        <result property="basicLibrary" column="basic_library"></result>
+        <result property="serviceContent" column="service_content"></result>
+        <result property="applicatEffect" column="applicat_effect"></result>
+        <result property="ljdycs" column="ljdycs"></result>
+        <collection  property="dataUpdateCondition" javaType="java.util.List" resultMap="dataUpdateMap" />
+    </resultMap>
+
+    <resultMap id="dataUpdateMap" type="com.kxj.bigscreen.entity.DataUpdateCondition">
+        <result property="dataUpdate" column="amount"></result>
+        <result property="dateId" column="date_id"></result>
+    </resultMap>
+
+    <select id="application" resultMap="applicationMap">
+         SELECT
+ b.leading_unit,
+ b.application,
+ b.service_mode,
+ b.basic_library,
+ b.service_content,
+ b.applicat_effect,
+ c.amount ljdycs,
+		part2.department_id,
+		part2.amount,
+		part2.date_id
+	FROM
+	(
+	SELECT
+	department_id,
+		amount,
+		month_tmp,
+		date_id,
+		ROW_NUMBER ( ) OVER ( PARTITION BY department_id, month_tmp ORDER BY date_id DESC ) rn
+	FROM
+		(
+	SELECT
+	temp1.department_id,
+		temp1.amount,
+			temp1.date_id,
+			temp1.month_tmp
+		FROM
+			( SELECT
+		department_id,
+		amount,
+		date_id,
+	substr( date_id :: VARCHAR, 0, 8 ) AS month_tmp
+FROM
+	"DAMA"."dm".dataman_update_condition
+WHERE
+	date_id IS NOT NULL) temp1
+			RIGHT JOIN (
+			SELECT
+				substr( date_id :: VARCHAR, 0, 8 ) AS month_tmp
+			FROM
+				"DAMA"."dm".dataman_update_condition
+			WHERE
+				date_id IS NOT NULL
+			GROUP BY
+				month_tmp
+			ORDER BY
+				month_tmp DESC
+				LIMIT 6
+			) temp2 ON temp1.month_tmp = temp2.month_tmp
+			) part1
+	) part2 right JOIN "DAMA"."dm".datamonitor1_application b on  rn=1 and part2.department_id=b.department_id inner join (SELECT department_id,amount,date_id,
+ ROW_NUMBER() OVER(PARTITION by (department_id) ORDER BY date_id DESC) AS rw
+ FROM "DAMA"."dm".dataman_collect_condition )c
+	on part2.department_id=c.department_id and c.rw=1
+	ORDER BY
+	date_id,department_id
+    </select>
+
+	<select id="transform" resultType="com.kxj.bigscreen.entity.Datamonitor2Tansform">
+		select depart_name ,
+table_note ,
+table_name ,
+totalcode_cnt ,
+rightcode_cnt ,
+othercode_cnt from "DAMA"."dm".datamonitor2_rd_transform
+	</select>
+
+	<select id="manage" resultType="com.kxj.bigscreen.entity.TransformManage">
+		select code_type,original_code,original_name,standard_code,standard_name
+		from "DAMA"."dm".datamonitor2_rd_transform_manage
+		<where>
+			<if test="tableName!= null and tableName !=''">
+				original_table=#{tableName}
+			</if>
+		</where>
+		order by code_type,original_code
+	</select>
+
+	<select id="service" resultType="com.kxj.bigscreen.entity.Datamonitor2StandardService">
+		select *from
+		(select to_char(date_id, 'YYYY-MM') as date_id , sum(data_count) data_count from "DAMA"."dm".datamonitor2_standard_service
+		GROUP BY date_id order BY date_id desc limit 6 )a
+		order BY date_id
+	</select>
+
+
+</mapper>

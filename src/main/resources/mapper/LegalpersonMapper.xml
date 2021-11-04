@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.LegalpersonDao">
+
+    <resultMap id="legalMap" type="com.kxj.bigscreen.model.Legalperson">
+        <id property="legalpersonId" column="legalperson_id"></id>
+        <result property="department" column="department"></result>
+        <result property="unifyCode" column="unifycode"></result>
+        <result property="orgCode" column="orgcode"></result>
+        <result property="regCode" column="regcode"></result>
+        <result property="orgName" column="orgname"></result>
+        <result property="orgType" column="orgtype"></result>
+        <result property="legalperson" column="legalperson"></result>
+        <result property="bussinessScope" column="bussinessscope"></result>
+        <result property="jylb" column="jylb"></result>
+        <result property="clDate" column="cldate"></result>
+        <result property="epState" column="epstate"></result>
+        <result property="valiDate" column="validate"></result>
+        <result property="regAddress" column="reg_address"></result>
+        <result property="telephone" column="telephone"></result>
+        <result property="dataVersion" column="data_version"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+
+
+    <!--查询法人库信息-->
+    <select id="findAll" resultMap="legalMap" >
+        select unifyCode, orgCode, regCode,
+        orgName , orgType , legalperson , bussinessScope , jylb , clDate , epState ,
+        valiDate , reg_address , telephone , update_time from "DAMA"."dm".main_legalperson_pri1
+        <where>
+            <if test="unifyCode != null and unifyCode !=''">
+                unifycode=#{unifyCode}
+            </if>
+            <if test="orgCode != null and orgCode !=''">
+                or orgcode=#{orgCode}
+            </if>
+            <if test="regCode != null and regCode !=''">
+                or regcode=#{regCode}
+            </if>
+            <if test="orgName !=null and orgName !=''">
+                or orgname=#{orgName};
+            </if>
+        </where>
+    </select>
+
+    <!--查询工商信息-->
+    <select id="findGS" resultMap="legalMap" >
+        select  unifyCode, orgCode, regCode, orgName , orgType , legalperson , bussinessScope , jylb , clDate , epState ,
+        valiDate , reg_address , telephone , update_time
+         from "DAMA"."dm".gs_mid_basic
+        <where>
+            <if test="unifyCode != null and unifyCode !=''">
+                unifycode=#{unifyCode}
+            </if>
+            <if test="orgCode != null and orgCode !=''">
+                or orgcode=#{orgCode}
+            </if>
+            <if test="regCode != null and regCode !=''">
+                or regcode=#{regCode}
+            </if>
+            <if test="orgName !=null and orgName !=''">
+                or orgname=#{orgName};
+            </if>
+        </where>
+    </select>
+
+    <!--查询质检信息-->
+    <select id="findZJ" resultMap="legalMap" >
+        select  unifyCode, orgCode, regCode, orgName , orgType , legalperson , bussinessScope , jylb , clDate , epState ,
+        valiDate , reg_address , telephone , update_time
+        from "DAMA"."dm".zj_mid_basic
+        <where>
+            <if test="unifyCode != null and unifyCode !=''">
+                unifycode=#{unifyCode}
+            </if>
+            <if test="orgCode != null and orgCode !=''">
+                or orgcode=#{orgCode}
+            </if>
+            <if test="regCode != null and regCode !=''">
+                or regcode=#{regCode}
+            </if>
+            <if test="orgName !=null and orgName !=''">
+                or orgname=#{orgName}
+            </if>
+        </where>
+    </select>
+
+    <!--查询市资源信息-->
+    <select id="findSZ" resultMap="legalMap" >
+        select  unifyCode, orgCode, regCode, orgName , orgType , legalperson , bussinessScope , jylb , clDate , epState ,
+        valiDate , reg_address , telephone , update_time
+        from "DAMA"."dm".sz_mid_basic
+        <where>
+            <if test="unifyCode != null and unifyCode !=''">
+                unifycode=#{unifyCode}
+            </if>
+            <if test="orgCode != null and orgCode !=''">
+                or orgcode=#{orgCode}
+            </if>
+            <if test="regCode != null and regCode !=''">
+                or regcode=#{regCode}
+            </if>
+            <if test="orgName !=null and orgName !=''">
+                or orgname=#{orgName};
+            </if>
+        </where>
+    </select>
+
+    <!--查询历史版本信息-->
+    <select id="findVersion" resultMap="legalMap" >
+        select unifyCode, orgCode, regCode, orgName , orgType , legalperson , bussinessScope , jylb , clDate , epState ,
+        valiDate , reg_address , telephone , update_time , data_version
+        from "DAMA"."dm".main_legalperson_pri1_history
+        <where>
+            <if test="unifyCode != null and unifyCode !=''">
+                unifycode=#{unifyCode}
+            </if>
+            <if test="orgCode != null and orgCode !=''">
+                or orgcode=#{orgCode}
+            </if>
+            <if test="regCode != null and regCode !=''">
+                or regcode=#{regCode}
+            </if>
+            <if test="orgName !=null and orgName !=''">
+                or orgname=#{orgName}
+            </if>
+
+        </where>
+        order by data_version asc limit 4
+    </select>
+
+    <resultMap id="metaMap" type="com.kxj.bigscreen.model.Meta">
+        <result property="metaInfo" column="meta_info"></result>
+        <result property="cnName" column="cn_name"></result>
+        <result property="enName" column="en_name"></result>
+        <result property="internalIdentifier" column="internal_identifier"></result>
+        <result property="cnTranslate" column="cn_translate"></result>
+        <result property="cnTranslateAbbr" column="cn_translate_abbr"></result>
+        <result property="illustrate" column="illustrate"></result>
+        <result property="context" column="context"></result>
+        <result property="objectWords" column="object_words"></result>
+        <result property="featureWords" column="feature_words"></result>
+        <result property="denote" column="denote"></result>
+        <result property="dataType" column="data_type"></result>
+        <result property="dataFormat" column="data_format"></result>
+        <result property="domain" column="domain"></result>
+        <result property="measureUnit" column="measure_unit"></result>
+        <result property="submitInstitutions" column="submit_institutions"></result>
+        <result property="serviceLogic" column="service_logic"></result>
+        <result property="remark" column="remark"></result>
+
+    </resultMap>
+    <!--查询人口库元数据信息-->
+    <select id="findMetaAll" resultMap="metaMap">
+        select meta_info , cn_name , en_name , internal_identifier, cn_translate , cn_translate_abbr ,
+        illustrate , context , object_words , feature_words , denote , data_type , data_format , domain ,
+        measure_unit , submit_institutions , service_logic , remark from "DAMA"."dm".metadata_standard
+        <where>
+            <if test="metaInfo != null and metaInfo !=''">
+                meta_info=#{metaInfo};
+            </if>
+        </where>
+    </select>
+</mapper>

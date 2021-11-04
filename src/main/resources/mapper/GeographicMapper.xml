@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.GeographicDao">
+
+    <select id="getGeographicName" resultType="com.kxj.bigscreen.entity.Geographic">
+        select
+        id,
+        "table",
+        table_name ,
+        parm ,
+        create_time
+        from "DAMA"."dm".geographic_name
+        <where>
+            1=1
+        </where>
+    </select>
+
+    <select id="getGeographicInfo" resultType="com.kxj.bigscreen.entity.GeographicInfo">
+        select
+      *
+        from "DAMA"."dm".geographic_info
+        <where>
+            id=#{id}
+        </where>
+    </select>
+
+    <select id="getGeographicSummary" resultType="com.kxj.bigscreen.entity.GeographicSummary">
+        select
+        *
+        from "DAMA"."di".geographic_summary
+        <where>
+            search_id=#{searchId}
+        </where>
+    </select>
+
+    <select id="getGeographicSummaryName" resultType="com.kxj.bigscreen.entity.GeographicSummary">
+        select
+        *
+        from "DAMA"."di".geographic_summary
+        <where>
+            search_id=#{searchId}
+            and name like CONCAT('%',#{name},'%')
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.StandardDao">
+
+    <resultMap id="standardMap" type="com.kxj.bigscreen.model.Standard">
+        <id property="id" column="id"></id>
+        <result property="firstTitle" column="first_title"></result>
+        <result property="secondTitle" column="second_title"></result>
+
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <resultMap id="second" type="com.kxj.bigscreen.model.SecondTitle">
+        <result property="secondTitle" column="second_title"></result>
+    </resultMap>
+
+    <select id="findStandard" resultMap="standardMap">
+        select first_title from (
+select min(id) id,first_title from "DAMA"."dm".standard group by first_title)a order by a.id
+    </select>
+
+    <select id="findTitle" resultMap="second">
+        select a.second_title from (select min(id) id
+,min(second_title) second_title from "DAMA"."dm".standard where first_title =#{firstTitle} GROUP BY second_title ) a  ORDER BY id
+    </select>
+
+    <resultMap id="pdfMap" type="com.kxj.bigscreen.model.StandardMap">
+        <result property="standard" column="standard" ></result>
+        <result property="standardUrl" column="standard_url"></result>
+
+    </resultMap>
+    <select id="findPdf" resultMap="pdfMap">
+        select standard , standard_url from (
+        select id , standard, standard_url , status,  ROW_NUMBER() OVER(PARTITION by ( standard,standard_url) ORDER BY "version" DESC) AS rw
+        from "DAMA"."dm".standard
+        where second_title =#{secondTitle} )a  where a.rw=1 and a.status='已发布' order by a.id limit 11 OFFSET #{pageStart};
+    </select>
+    <select id="findTotal" resultType="java.lang.Integer">
+        select count(standard_url) from "DAMA"."dm".standard where second_title =#{secondTitle};
+    </select>
+    <resultMap id="standardAmountMap" type="com.kxj.bigscreen.model.StandardAmount">
+        <id property="id" column="id"></id>
+        <result property="type" column="type"></result>
+        <result property="item" column="item"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findAmount" resultMap="standardAmountMap">
+        select type , amount from "DAMA"."dm".standard_amount where id in(1,2,3,4);
+    </select>
+    <select id="findItem" resultMap="standardAmountMap">
+        select type , item , amount from "DAMA"."dm".standard_amount where id=5;
+    </select>
+
+    <select id="search" resultType="com.kxj.bigscreen.model.StandardMap">
+        select standard , standard_url
+        from (
+        SELECT standard ,standard_url , "version" , status,
+        ROW_NUMBER() OVER(PARTITION by (standard) ORDER BY "version" DESC) AS rw
+        from "DAMA"."dm".standard
+        <where>
+            <if test="standard != null and standard !=''">
+                standard like concat('%',#{standard},'%')
+            </if>
+            and standard is not null and status='已发布'
+        </where>)a where a.rw=1
+    </select>
+
+    <resultMap id="all" type="com.kxj.bigscreen.model.FirstTitle">
+        <result property="titleName" column="first_title"></result>
+        <collection property="children" javaType="java.util.List" resultMap="second2"></collection>
+    </resultMap>
+
+    <resultMap id="second2" type="com.kxj.bigscreen.model.Second">
+        <result property="titleName" column="second_title"></result>
+        <result property="level" column="level"></result>
+        <collection property="children" javaType="java.util.List" resultMap="thirt"></collection>
+    </resultMap>
+
+    <resultMap id="thirt" type="com.kxj.bigscreen.model.Thirt">
+        <result property="id" column="id"></result>
+        <result property="firstTitle" column="first_title"></result>
+        <result property="secondTitle" column="second_title"></result>
+        <result property="titleName" column="standard" ></result>
+        <result property="standardUrl" column="standard_url"></result>
+        <result property="status" column="status"></result>
+        <result property="code" column="code"></result>
+        <result property="version" column="version"></result>
+        <result property="level" column="level2"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+    <select id="findAll" resultMap="all">
+       SELECT "id", first_title , second_title , standard ,standard_url , "version" , status, update_time ,2 as level ,
+       3 as level2
+FROM
+(
+ SELECT  "id", first_title , second_title , standard ,standard_url , "version" , status, update_time,
+ ROW_NUMBER() OVER(PARTITION by (first_title , second_title , standard) ORDER BY "version" DESC) AS rw
+  FROM  "DAMA"."dm".standard
+ WHERE first_title IS NOT NULL
+ ) a
+WHERE a.rw = 1
+    </select>
+
+    <delete id="delete" parameterType="integer">
+        delete  from "DAMA"."dm".standard
+        <where>
+            <if test="id !=''">
+                id =#{id}
+            </if>
+        </where>
+    </delete>
+
+    <select id="select" resultType="Integer">
+        select max(version) as version from "DAMA"."dm".standard
+        <where>
+
+            <if test="firstTitle != null and firstTitle !=''">
+                first_title =#{firstTitle}
+            </if>
+            <if test="secondTitle != null and secondTitle !=''">
+               and second_title =#{secondTitle}
+            </if>
+            <if test="titleName != null and titleName !=''">
+              and  standard =#{titleName}
+            </if>
+
+        </where>
+    </select>
+
+    <insert id="insert" >
+        insert into "DAMA"."dm".standard (first_title , second_title , standard , standard_url ,
+         update_time ,status , version ) values (#{firstTitle} , #{secondTitle} , #{titleName} , #{standardUrl},
+         #{updateTime} , #{status} , #{version})
+    </insert>
+
+    <update id="update">
+        update "DAMA"."dm".standard set first_title=#{firstTitle} , second_title=#{secondTitle} , standard_url=#{standardUrl},
+        status=#{status}, update_time=#{updateTime}
+        <where>
+            <if test="id !=''">
+                id =#{id}
+            </if>
+        </where>
+
+    </update>
+</mapper>

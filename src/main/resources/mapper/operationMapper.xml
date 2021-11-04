@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.OperationDao">
+
+
+    <resultMap id="standardMap" type="com.kxj.bigscreen.model.StandardMonitor">
+        <id property="id" column="id"></id>
+        <result property="step" column="step"></result>
+        <result property="type" column="type"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+    <select id="findClean" resultMap="standardMap">
+        select id ,type , amount from "DAMA"."dm".standard_monitor where step='数据清洗';
+    </select><select id="findOptimization" resultMap="standardMap">
+        select id ,type , amount from "DAMA"."dm".standard_monitor where step='数据优化';
+    </select><select id="findStandard" resultMap="standardMap">
+        select id ,type , amount from "DAMA"."dm".standard_monitor where step='数据规范';
+    </select>
+    <select id="findFuse" resultMap="standardMap">
+        select id ,type , amount from "DAMA"."dm".standard_monitor where step='数据关联融合';
+    </select>
+    <select id="dataAmount" resultType="java.lang.Integer">
+        select data_amount from "DAMA"."dm".data_collect;
+    </select>
+    <resultMap id="basisMap" type="com.kxj.bigscreen.model.DataGovernBasis">
+        <id property="id" column="id"></id>
+        <result property="type" column="type"></result>
+        <result property="amount" column="amount"></result>
+        <result property="url" column="url"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findBasis" resultMap="basisMap">
+        select id , type , amount  from "DAMA"."dm".data_govern_basis;
+    </select>
+
+    <select id="findBasisPdf" resultMap="basisMap">
+        select url from "DAMA"."dm".data_govern_basis
+        <where>
+            <if test="type != null and type != ''">
+                type=#{type};
+            </if>
+        </where>
+    </select>
+
+    <resultMap id="serverMap" type="com.kxj.bigscreen.model.DataGovernServer">
+        <id property="id" column="id" ></id>
+        <result property="type" column="type"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findServer" resultMap="serverMap">
+        select type , amount from "DAMA"."dm".data_govern_server;
+    </select>
+    
+    <resultMap id="codeServerMap" type="com.kxj.bigscreen.model.CodeServer">
+        <id property="id" column="id"></id>
+        <result property="status" column="status"></result>
+        <result property="type" column="type"></result>
+        <result property="item" column="item"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <resultMap id="codeMap" type="com.kxj.bigscreen.model.CodeMap">
+        <result property="type" column="type"></result>
+        <result property="item" column="item"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+    <select id="findOriginal" resultMap="codeServerMap">
+        select status , type, amount from "DAMA"."dm".code_server where status='原始';
+    </select>
+    <select id="findStandards" resultMap="codeServerMap">
+        select status , type, amount from "DAMA"."dm".code_server where status='标准';
+    </select>
+
+    <select id="findCodeMap" resultMap="codeMap">
+        select type , item , amount from "DAMA"."dm".code_map;
+    </select>
+    <resultMap id="standardTopMap" type="com.kxj.bigscreen.model.StandardTop">
+        <id property="id" column="id"></id>
+        <result property="type" column="type"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findStandardTop" resultMap="standardTopMap">
+        select id , type , amount from "DAMA"."dm".standard_top limit 7
+    </select>
+
+    <resultMap id="codeTopMap" type="com.kxj.bigscreen.model.CodeTop">
+        <id property="id" column="id" ></id>
+        <result property="type" column="type"></result>
+        <result property="amount" column="amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findCodeTop" resultMap="codeTopMap">
+        select type , amount from "DAMA"."dm".code_top order by amount DESC limit 6
+    </select>
+    
+    <resultMap id="wordMap" type="com.kxj.bigscreen.model.CodeStandard">
+        <id property="id" column="id"></id>
+        <result property="type" column="type"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findWord" resultMap="wordMap">
+        select id , type from "DAMA"."dm".code_standard;
+    </select>
+
+    <resultMap id="timeup" type="com.kxj.bigscreen.model.Time">
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="updateTime" resultMap="timeup">
+        select update_time from "DAMA"."dm".data_govern_basis order by update_time desc limit 1
+    </select>
+
+    <select id="updateTimes" resultMap="timeup">
+        select update_time from "DAMA"."dm".code_server order by update_time desc limit 1
+    </select>
+</mapper>

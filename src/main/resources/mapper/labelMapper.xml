@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.LabelDao">
+
+
+    <resultMap id="gz" type="com.kxj.bigscreen.entity.DataservPersonGzdz">
+        <result property="idcard" column="idcard"></result>
+        <result property="idcard15" column="idcard_15"></result>
+        <result property="entName" column="ent_name"></result>
+        <result property="regAddress" column="reg_address"></result>
+        <result property="entState" column="ent_state"></result>
+        <result property="industryCode" column="industry_code"></result>
+        <result property="staffNumber" column="staff_number"></result>
+        <result property="lat" column="lat"></result>
+        <result property="lng" column="lng"></result>
+    </resultMap>
+
+    <resultMap id="hj" type="com.kxj.bigscreen.entity.DataservPersonHjdz">
+        <result property="idcard" column="idcard"></result>
+        <result property="idcard15" column="idcard_15"></result>
+        <result property="rprProvince" column="rpr_province"></result>
+        <result property="rprCity" column="rpr_city"></result>
+        <result property="rprDistrict" column="rpr_district"></result>
+        <result property="rprStreet" column="rpr_street"></result>
+        <result property="rprAddress" column="rpr_address"></result>
+        <result property="lat" column="lat"></result>
+        <result property="lng" column="lng"></result>
+    </resultMap>
+
+    <resultMap id="jz" type="com.kxj.bigscreen.entity.DataservPersonJzdz">
+        <result property="idcard" column="idcard"></result>
+        <result property="idcard15" column="idcard_15"></result>
+        <result property="presentProvince" column="present_province"></result>
+        <result property="presentCity" column="present_city"></result>
+        <result property="presentDistrict" column="present_district"></result>
+        <result property="presentStreet" column="present_street"></result>
+        <result property="presentAddress" column="present_address"></result>
+        <result property="lat" column="lat"></result>
+        <result property="lng" column="lng"></result>
+    </resultMap>
+
+    <resultMap id="label" type="com.kxj.bigscreen.entity.DataservPersonalLabel">
+        <result property="relationLabel" column="relation_label"></result>
+        <result property="idcard" column="idcard"></result>
+        <result property="idcard15" column="idcard_15"></result>
+        <result property="name" column="name"></result>
+        <result property="sex" column="sex"></result>
+        <result property="age" column="age"></result>
+        <result property="birthdate" column="birthdate"></result>
+        <result property="telephone" column="telephone"></result>
+        <result property="birthAddr" column="birth_addr"></result>
+        <result property="nativePlace" column="native_place"></result>
+        <result property="ethnicGroup" column="ethnic_group"></result>
+        <result property="nationality" column="nationality"></result>
+        <result property="edulevel" column="edulevel"></result>
+        <result property="polity" column="polity"></result>
+        <result property="marriageType" column="marriage_type"></result>
+        <result property="companyname" column="companyname"></result>
+        <result property="presentAddress" column="present_address"></result>
+        <result property="rprAddress" column="rpr_address"></result>
+        <result property="rprtype" column="rprtype"></result>
+        <result property="rprstatus" column="rpr_status"></result>
+        <result property="hostrelation" column="hostrelation"></result>
+        <result property="dcId" column="dc_id"></result>
+        <result property="dLevel" column="d_level"></result>
+        <result property="dKind" column="d_kind"></result>
+        <result property="dieDate" column="die_date"></result>
+        <result property="facePic" column="face_pic"></result>
+        <result property="ifHoldpeople" column="if_holdpeople"></result>
+        <result property="ifOld" column="if_old"></result>
+        <result property="ifRegiter" column="if_regiter"></result>
+        <result property="ifFloat" column="if_float"></result>
+        <result property="ifMarriage" column="if_marriage"></result>
+        <result property="dieFlag" column="die_flag"></result>
+        <result property="ifRecipient" column="if_recipient"></result>
+        <result property="ifDisability" column="if_disability"></result>
+        <result property="ifActual" column="if_actual"></result>
+        <result property="ifJf" column="if_jf"></result>
+        <result property="ifXcjy" column="if_xcjy"></result>
+    </resultMap>
+
+    <resultMap id="relation" type="com.kxj.bigscreen.entity.DataservRelationLabel">
+        <result property="idcard" column="idcard"></result>
+        <result property="idcard15" column="idcard_15"></result>
+        <result property="rprno" column="rprno"></result>
+        <result property="presentAddress" column="present_address"></result>
+        <result property="presentVillage" column="present_village"></result>
+        <result property="companyname" column="companyname"></result>
+        <result property="cntRprno" column="cnt_rprno"></result>
+        <result property="cntPresentAddress" column="cnt_present_address"></result>
+        <result property="cntPresentVillage" column="cnt_present_village"></result>
+        <result property="cntCompanyname" column="cnt_companyname"></result>
+    </resultMap>
+
+    <resultMap id="chain" type="com.kxj.bigscreen.entity.DataservRelationChain">
+        <result property="idcard" column="idcard"></result>
+        <result property="idcard15" column="idcard_15"></result>
+        <result property="monthId" column="month_id"></result>
+        <result property="cntTotal" column="cnt_total"></result>
+        <result property="cntSuccess" column="cnt_success"></result>
+    </resultMap>
+
+    <select id="gzdz" resultMap="gz">
+        select  ent_name , reg_address , reg_id , ent_state , industry_code
+ , staff_number , lat , lng from "DAMA"."dm".dataserv_person_gzdz
+ <where>
+     <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+         idcard=#{idcard}
+     </if>
+     <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+         idcard_15=#{idcard15}
+     </if>
+ </where>
+    </select>
+
+
+    <select id="hjdz" resultMap="hj">
+        select  rpr_province , rpr_city , rpr_district , rpr_street ,
+         rpr_address,
+         lat , lng
+        from "DAMA"."dm".dataserv_person_hjdz
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>
+    </select>
+
+    <select id="jzdz" resultMap="jz">
+        select  present_province ,
+        present_city ,
+        present_district ,
+        present_street ,
+         present_address, lat , lng
+        from "DAMA"."dm".dataserv_person_jzdz
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+
+        </where>
+    </select>
+
+
+    <select id="label" resultMap="label">
+        select  case when idcard &lt;&gt;'' and idcard is not null then concat(left(idcard,5),'**********',right(idcard,3))else '' end as idcard  ,
+        case when idcard_15 &lt;&gt;'' and idcard_15 is not null then concat(left(idcard_15,5),'**********',right(idcard_15,3))else '' end as idcard_15 ,
+        case when name &lt;&gt;'' and name is not null then concat(left(name,1),'**')else '' end as name ,
+        sex, age , birthdate ,
+        case when telephone &lt;&gt;'' and telephone is not null then concat(left(telephone,3),'*****',right(telephone,3))else '' end as telephone,
+         birth_addr ,
+        native_place , ethnic_group , nationality , edulevel , polity , marriage_type ,
+        companyname ,
+        case when present_address &lt;&gt;'' and present_address is not null then concat(left(present_address,12),'*****')else '' end as present_address,
+        case when rpr_address &lt;&gt;'' and rpr_address is not null then concat(left(rpr_address,12),'*****')else '' end as rpr_address ,
+          rprtype ,rpr_status , hostrelation ,
+        dc_id ,d_level , d_kind , die_date , face_pic , if_holdpeople , if_old , if_regiter , if_float ,
+        if_marriage , die_flag , if_recipient , if_disability , if_actual , if_jf , if_xcjy ,if_wish_vaccine,if_have_vaccine
+        from "DAMA"."dm".dataserv_personal_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                 idcard_15=#{idcard15}
+            </if>
+        </where>
+    </select>
+
+    <select id="rela" resultMap="relation">
+        select  idcard , idcard_15 , rprno , present_address , present_village , companyname ,
+        cnt_rprno , cnt_present_address , cnt_present_village , cnt_companyname
+        from "DAMA"."dm".dataserv_relation_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="chain" resultMap="chain">
+        select idcard , idcard_15 , substr( month_id :: VARCHAR, 0, 8 )month_id , cnt_total , cnt_success
+        from "DAMA"."dm".dataserv_relation_chain
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where> order by month_id desc limit 4
+    </select>
+
+    <select id="news" resultType="com.kxj.bigscreen.entity.DataservNewsRecommend">
+        select title , contents , pic
+        from "DAMA"."dm".dataserv_news_recommend
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>
+    </select>
+
+    <select id="chainLabel" resultMap="label">
+        SELECT relation_label,idcard,
+        case when name &lt;&gt;'' and name is not null then concat(left(name,1),'**')else '' end as name ,
+        sex,age, birthdate,
+        case when telephone &lt;&gt;'' and telephone is not null then concat(left(telephone,3),'*****',right(telephone,3))else '' end as telephone,
+        birth_addr,companyname,
+        case when present_address &lt;&gt;'' and present_address is not null then concat(left(present_address,12),'*****')else '' end as present_address,
+        case when rpr_address &lt;&gt;'' and rpr_address is not null then concat(left(rpr_address,12),'*****')else '' end as rpr_address
+        FROM
+        (
+        SELECT
+        '相同户号' relation_label,
+        b.*
+        FROM
+        (select * from dm.dataserv_relation_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>)A JOIN dm.dataserv_personal_label b ON b.rprno = A.rprno
+        AND A.idcard &lt;&gt; b.idcard UNION ALL
+        SELECT
+        '相同住址' relation_label,
+        b.*
+        FROM
+        (select * from dm.dataserv_relation_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>)
+        A JOIN dm.dataserv_personal_label b ON b.present_address = A.present_address
+        AND A.idcard &lt;&gt; b.idcard UNION ALL
+        SELECT
+        '相同单位' relation_label,
+        b.*
+        FROM
+        (select * from dm.dataserv_relation_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>)
+        A JOIN dm.dataserv_personal_label b ON b.companyname = A.companyname
+        AND A.idcard &lt;&gt; b.idcard
+        ) b
+        ORDER BY
+        relation_label limit 3
+    </select>
+
+
+    <select id="chainLabel1" resultMap="label">
+        SELECT relation_label,case when idcard &lt;&gt;'' and idcard is not null then concat(left(idcard,5),'**********',right(idcard,3))else '' end as idcard  ,
+        case when idcard_15 &lt;&gt;'' and idcard_15 is not null then concat(left(idcard_15,5),'**********',right(idcard_15,3))else '' end as idcard_15 ,
+        case when name &lt;&gt;'' and name is not null then concat(left(name,1),'**')else '' end as name ,
+        sex,age, birthdate,
+        case when telephone &lt;&gt;'' and telephone is not null then concat(left(telephone,3),'*****',right(telephone,3))else '' end as telephone,
+        birth_addr,companyname,
+        case when present_address &lt;&gt;'' and present_address is not null then concat(left(present_address,12),'*****')else '' end as present_address,
+        case when rpr_address &lt;&gt;'' and rpr_address is not null then concat(left(rpr_address,12),'*****')else '' end as rpr_address
+        FROM
+        (
+        SELECT
+        '相同户号' relation_label,
+        b.*
+        FROM
+        (select * from dm.dataserv_relation_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>)A JOIN dm.dataserv_personal_label b ON b.rprno = A.rprno
+        AND A.idcard &lt;&gt; b.idcard UNION ALL
+        SELECT
+        '相同住址' relation_label,
+        b.*
+        FROM
+        (select * from dm.dataserv_relation_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>)
+        A JOIN dm.dataserv_personal_label b ON b.present_address = A.present_address
+        AND A.idcard &lt;&gt; b.idcard UNION ALL
+        SELECT
+        '相同单位' relation_label,
+        b.*
+        FROM
+        (select * from dm.dataserv_relation_label
+        <where>
+            <if test="idcard!= null and idcard !=''and idcard.length() == 18">
+                idcard=#{idcard}
+            </if>
+            <if test="idcard15!= null and idcard15 !=''and idcard15.length() == 15">
+                idcard_15=#{idcard15}
+            </if>
+        </where>)
+        A JOIN dm.dataserv_personal_label b ON b.companyname = A.companyname
+        AND A.idcard &lt;&gt; b.idcard
+        ) b
+        ORDER BY
+        relation_label
+    </select>
+
+</mapper>

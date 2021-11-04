@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.CompanyDao">
+
+
+    <select id="category" resultType="com.kxj.bigscreen.entity.CompanyCategory">
+       select category_type , sum(number)number from "DAMA"."dm".company_category
+        where
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by category_type order by number desc limit 6
+    </select>
+
+    <select id="cateGross" resultType="java.util.HashMap">
+        select sum(number)number  from "DAMA"."dm".company_category  where
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+    </select>
+
+    <select id="companyType" resultType="com.kxj.bigscreen.entity.CompanyType">
+       select company_type , sum(number)number from "DAMA"."dm".company_type  where
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where> group by company_type order by number desc limit 6
+    </select>
+
+    <select id="companyGross" resultType="java.util.HashMap">
+        select sum(number)number  from "DAMA"."dm".company_type  where
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+    </select>
+
+
+    <select id="register" resultType="com.kxj.bigscreen.entity.Company">
+             select b.cx,c.zdx,d.qc,a.regist_time from
+        (select regist_time from "DAMA"."dm".company where regist_time>='1980' and update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+
+        GROUP BY regist_time)a left join
+ (select sum(number)cx ,regist_time from "DAMA"."dm".company where company_status ='存续'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+  GROUP BY regist_time)b on a.regist_time=b.regist_time
+ left join (select sum(number)zdx ,regist_time from "DAMA"."dm".company where company_status ='注吊销'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY regist_time)c
+on c.regist_time=a.regist_time left join (select sum(number)qc ,regist_time from "DAMA"."dm".company where company_status ='迁出'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY regist_time)d on a.regist_time=d.regist_time 
+  order by a.regist_time
+    </select>
+
+
+    <select id="area" resultType="com.kxj.bigscreen.entity.ComGross">
+        select area_name,a.gross,a.cx,a.zdx,a.qc from "DAMA"."dm".area area left join
+
+(select a.area_id,a.gross,b.cx,c.zdx,d.qc from
+(select sum(number)gross ,area_id from "DAMA"."dm".company GROUP BY area_id)a
+left join (select sum(number)cx ,area_id from "DAMA"."dm".company where company_status ='存续'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+GROUP BY area_id)b on a.area_id=b.area_id left join
+        (select sum(number)zdx ,area_id from "DAMA"."dm".company
+        where company_status ='注吊销'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY area_id)c on c.area_id=a.area_id left join
+        (select sum(number)qc ,area_id from "DAMA"."dm".company where company_status ='迁出'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY area_id)d on a.area_id=d.area_id)a on a.area_id=area.area_id
+
+    </select>
+
+    <select id="time" resultType="com.kxj.bigscreen.entity.Company">
+          SELECT distinct
+    substr( update_time :: VARCHAR, 0, 8 ) AS update_time
+   FROM
+    "DAMA"."dm".company
+   GROUP BY
+    update_time
+   ORDER BY
+    update_time DESC
+
+    </select>
+
+
+    <select id="company" resultType="com.kxj.bigscreen.entity.ComGross">
+        select round(a.gross/10000,0)gross,round(b.cx/10000,0)cx,round(c.zdx/10000,0)zdx,d.qc,a.update_time from
+        (select sum(number)gross ,update_time from "DAMA"."dm".company GROUP BY update_time)a left join (select sum(number)cx ,update_time from "DAMA"."dm".company where company_status ='存续' GROUP BY update_time)b on a.update_time=b.update_time left join (select sum(number)zdx ,update_time from "DAMA"."dm".company where company_status ='注吊销' GROUP BY update_time)c on c.update_time=b.update_time left join (select sum(number)qc,update_time from "DAMA"."dm".company where company_status ='迁出' GROUP BY update_time)d on c.update_time=d.update_time where
+        a.update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="detail" resultType="com.kxj.bigscreen.entity.CompanyDetail">
+        select area.area_id,area_name,a.gross,a.cx,a.zdx,a.qc,b.health,b.education,b.financial,b.make,b.retail,b.hotel,c.chinaForeign,c.stockLimited,c.dutyLimited,c.stateOwned,c.collective,c.consortia from "DAMA"."dm".area area left join
+
+(select a.area_id,a.gross,b.cx,c.zdx,d.qc from
+(select sum(number)gross ,area_id from "DAMA"."dm".company
+        where
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY area_id)a left join
+        (select sum(number)cx ,area_id from "DAMA"."dm".company where company_status ='存续'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY area_id)b on a.area_id=b.area_id left join
+        (select sum(number)zdx ,area_id from "DAMA"."dm".company where company_status ='注吊销'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY area_id)c on c.area_id=a.area_id left join
+        (select sum(number)qc ,area_id from "DAMA"."dm".company where company_status ='迁出'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        GROUP BY area_id)d on a.area_id=d.area_id )a on a.area_id=area.area_id
+
+left join
+(select a.area_id,a.health,b.education,c.financial,d.make,e.retail,f.hotel from
+(select sum(number)health,area_id from "DAMA"."dm".company_category
+where category_type='卫生和社会工作'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)a left join
+(select sum(number)education,area_id from "DAMA"."dm".company_category
+where category_type='教育'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)b on a.area_id=
+b.area_id left join (select sum(number)financial,area_id from "DAMA"."dm".company_category
+where category_type='金融业'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)c on c.area_id=
+a.area_id left join (select sum(number)make,area_id from "DAMA"."dm".company_category
+where category_type='制造业'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)d on a.area_id=
+d.area_id left join (select sum(number)retail,area_id from "DAMA"."dm".company_category
+where category_type='批发和零售业'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)e on e.area_id=a.area_id left join (select sum(number)hotel,area_id from "DAMA"."dm".company_category
+where category_type='住宿和餐饮业'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_category
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)f on e.area_id=f.area_id )b on b.area_id=area.area_id  left join
+
+
+(select a.area_id,a.chinaForeign,b.stockLimited,c.dutyLimited,d.stateOwned,e.collective,f.consortia from
+(select sum(number)chinaForeign,area_id from "DAMA"."dm".company_type
+where company_type='中外合资'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)a left join
+(select sum(number)stockLimited,area_id from "DAMA"."dm".company_type
+where company_type='股份有限公司'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)b on a.area_id=
+b.area_id left join (select sum(number)dutyLimited,area_id from "DAMA"."dm".company_type
+where company_type='有限责任公司'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)c on c.area_id=
+a.area_id left join (select sum(number)stateOwned,area_id from "DAMA"."dm".company_type
+where company_type='国有全资'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)d on a.area_id=
+d.area_id left join (select sum(number)collective,area_id from "DAMA"."dm".company_type
+where company_type='集体全资'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)e on e.area_id=a.area_id left join (select sum(number)consortia,area_id from "DAMA"."dm".company_type
+where company_type='联营'
+        and
+        update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company_type
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+        group by area_id)f on a.area_id=f.area_id)c on c.area_id=area.area_id
+    </select>
+
+    <select id="comArea" resultType="com.kxj.bigscreen.entity.Area">
+        select area.area_id,area_name,a.gross from "DAMA"."dm".area area left join
+        (select sum(number)gross ,area_id,update_time from "DAMA"."dm".company GROUP BY area_id,update_time)a
+        on area.area_id=a.area_id where
+        a.update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".company
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+
+        </where>
+    </select>
+
+
+
+</mapper>

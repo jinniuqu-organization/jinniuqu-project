@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.Person1Dao">
+
+    <select id="statistics" resultType="com.kxj.bigscreen.entity.PersonStatistics">
+        select round(gross/10000,0) gross , round(in_effect/10000,0) in_effect ,
+        round(stream/10000,0) stream ,round(census/10000,0) census from "DAMA"."dm".person_statistics where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".person_statistics
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+             to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+    </where>
+    </select>
+
+    <select id="time" resultType="com.kxj.bigscreen.entity.PersonStatistics">
+        SELECT distinct
+    substr( update_time :: VARCHAR, 0, 8 ) AS update_time
+   FROM
+    "DAMA"."dm".person_statistics
+   GROUP BY
+    update_time
+   ORDER BY
+    update_time DESC
+
+    </select>
+
+
+    <select id="sex" resultType="com.kxj.bigscreen.entity.Sex">
+        select sum(man) man , round("numeric"(sum(man)*100)/"numeric"(sum(man+woman)),2) man_hold ,
+         sum(woman) woman , round("numeric"(sum(woman)*100)/"numeric"(sum(man+woman)),2) woman_hold
+        from "DAMA"."dm".sex
+        where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+    </select>
+
+
+    <select id="marriage" resultType="com.kxj.bigscreen.entity.Marriage">
+        select sum(married) married , round("numeric"(sum(married)*100)/"numeric"(sum(married+unmarried)),2) married_hold ,
+        sum(unmarried) unmarried , round("numeric"(sum(unmarried)*100)/"numeric"(sum(married+unmarried)),2) unmarried_hold
+        from "DAMA"."dm".marriage where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".marriage
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="personLabel" resultType="com.kxj.bigscreen.entity.PersonLabel">
+        select sum(disability) disability , round("numeric"(sum(disability)*100)/"numeric"(sum(gross)),2) disability_hold ,
+        sum(party_member) party_member , round("numeric"(sum(party_member)*100)/"numeric"(sum(gross)),2) party_member_hold
+        from "DAMA"."dm".person_label
+        where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".person_label
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="education" resultType="com.kxj.bigscreen.entity.Education">
+       select education_status , sum(number)number from "DAMA"."dm".education
+        where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".education
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where> group by education_status order by number desc limit 6
+    </select>
+
+    <select id="educationGross" resultType="java.util.HashMap">
+        select sum(number)number  from "DAMA"."dm".education
+        where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".education
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="ageDistribute" resultType="com.kxj.bigscreen.entity.AgeDistribute">
+        select sum(man)man , sum(woman) woman, age , sum(man+woman) gross from "DAMA"."dm".sex
+        where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+ GROUP BY age
+    </select>
+
+    <select id="area" resultType="com.kxj.bigscreen.entity.AgeDistribute">
+        SELECT area.area_name , sum(b.man)man,sum(b.woman)woman from "DAMA"."dm".sex b inner join "DAMA"."dm".area area on area.area_id=b.area_id
+        where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+         group by b.area_id ,area.area_name
+    </select>
+
+    <select id="detail" resultType="com.kxj.bigscreen.entity.PersonDetail">
+        select  area.area_id,area_name ,person_label.gross,b.man ,b.woman,marriage.married,marriage.unmarried,c.child,c.eighteen,c.thirty,c.forty,c.fifty,
+        c.sixty,d.junior,d.high,d.undergraduate,d.master_doctor, person_label.disability ,person_label.party_member  from
+        "DAMA"."dm".area  area LEFT JOIN
+        (select area_id ,gross , disability ,party_member from "DAMA"."dm".person_label
+       where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".person_label
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        )person_label on person_label.area_id=area.area_id
+        LEFT JOIN
+        (select area_id,married,unmarried from "DAMA"."dm".marriage where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".marriage
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        )marriage on marriage.area_id=area.area_id
+        left join
+        (select area_id,sum(man) man, sum(woman) woman from "DAMA"."dm".sex where
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        GROUP BY area_id)b on area.area_id =b.area_id
+        left join
+        (select a.area_id ,a.child ,b.eighteen,c.thirty,d.forty,e.fifty,f.sixty from
+        (select area_id,sum(man+woman)child from "DAMA"."dm".sex where age&lt;18
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        GROUP BY area_id )a left JOIN
+        (select area_id,sum(man+woman)eighteen from "DAMA"."dm".sex where age>18 and age&lt;31
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        GROUP BY area_id)b on a.area_id=b.area_id left join
+        (select  area_id,sum(man+woman)thirty from "DAMA"."dm".sex where age>30 and age&lt;41
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        GROUP BY area_id)c on c.area_id=a.area_id left join
+        (select area_id,sum(man+woman)forty from "DAMA"."dm".sex where age>40 and age&lt;51
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        GROUP BY area_id)d on a.area_id=d.area_id
+        left join (select area_id,sum(man+woman)fifty from "DAMA"."dm".sex where age>50 and age&lt;61
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        GROUP BY area_id)e on e.area_id=a.area_id left join
+        (select area_id,sum(man+woman)sixty from "DAMA"."dm".sex where age>60
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".sex
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        GROUP BY area_id)f on f.area_id=e.area_id )c on c.area_id=area.area_id
+        left join
+        (select a.area_id,a.junior,b.high,c.undergraduate,d.master_doctor from(select area_id,sum(number)junior from "DAMA"."dm".education
+        where education_status in('普通高中结业','普通高中肄业','初级中学教育','初中毕业','初中肄业','小学教育','小学毕业','小学肄业','其他')
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".education
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        group by area_id)a left join (select area_id, sum(number)high from "DAMA"."dm".education
+        where education_status in('普通高中毕业','职业高中毕业') and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".education
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        group by area_id)b on a.area_id=b.area_id left JOIN (select area_id, sum(number)undergraduate from "DAMA"."dm".education
+        where education_status in('大学本科','大学本科毕业')
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".education
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        group by area_id)c on c.area_id=b.area_id left join (select area_id, sum(number)master_doctor from "DAMA"."dm".education
+        where education_status in('硕士研究生毕业','博士研究生毕业')
+        and
+        update_time =
+        (select distinct max(update_time)update_time from "DAMA"."dm".education
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+        group by area_id)d on c.area_id=d.area_id )d on d.area_id=area.area_id
+    </select>
+
+    <select id="person" resultType="com.kxj.bigscreen.entity.Area">
+        select  area.area_id,area_name ,gross from
+        "DAMA"."dm".area  area LEFT JOIN
+        "DAMA"."dm".person_label a on a.area_id=area.area_id
+        where a.update_time=
+        (select distinct max(update_time)update_time from "DAMA"."dm".person_statistics
+        <where>
+            <if test="updateTime != null and updateTime !=''">
+                to_char(update_time, 'yyyy-MM-dd') like concat ('%',#{updateTime},'%'))
+            </if>
+        </where>
+
+
+    </select>
+
+
+</mapper>

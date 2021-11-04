@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.QualityDao">
+
+    <resultMap id="qualityAllMap" type="com.kxj.bigscreen.model.DataQuality">
+        <result property="ruleGross" column="rule_gross"></result>
+        <result property="modelGross" column="model_gross"></result>
+        <result property="dataGross" column="data_gross"></result>
+        <result property="problem" column="problem"></result>
+        <result property="holdGross" column="hold_gross"></result>
+        <result property="holdProblem" column="hold_problem"></result>
+        <result property="updateTime" column="updateTime"></result>
+    </resultMap>
+
+    <select id="findAll" resultMap="qualityAllMap">
+        select rule_gross , model_gross , data_gross , problem , round("numeric"(problem)/"numeric"(data_gross),2)hold_gross ,
+        processed , round("numeric"(processed)/"numeric"(problem),2)hold_problem from "DAMA"."dm".data_quality
+        order by update_time desc limit 1
+    </select>
+
+    <select id="threeMonth" resultMap="qualityAllMap">
+        SELECT rule_gross from "DAMA"."dm"."data_quality" where update_time &lt;=
+        (select(SELECT update_time FROM "DAMA"."dm"."data_quality" ORDER BY update_time DESC LIMIT 1 ) - "interval" ( '3 month' ) AS update_time )
+        order BY update_time desc limit 1
+    </select>
+    <resultMap id="timelyMap" type="com.kxj.bigscreen.model.Timely">
+        <result property="dataSource" column="data_source"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findTimely" resultMap="timelyMap">
+        select data_source , update_time from "DAMA"."dm".timely order by update_time DESC limit 7;
+    </select>
+
+    <resultMap id="detailMap" type="com.kxj.bigscreen.model.Detail">
+        <id property="id" column="id"></id>
+        <result property="dataSource" column="data_source"></result>
+        <result property="tableName" column="table_name"></result>
+        <result property="tableCname" column="table_cname"></result>
+        <result property="dataAmount" column="data_amount"></result>
+        <result property="tableSize" column="table_size"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findDetail" resultMap="detailMap">
+        select id , data_source , table_name , table_cname , data_amount , table_size ,update_time
+        from "DAMA"."dm".detail
+    </select>
+
+    <resultMap id="updateMap" type="com.kxj.bigscreen.model.QualityUpdate">
+        <id property="id" column="id"></id>
+        <result property="department" column="department"></result>
+        <result property="type" column="type"></result>
+        <result property="amount" column="amount"></result>
+        <result property="sourceHold" column="source_hold"></result>
+        <result property="optimizeHold" column="optimize_hold"></result>
+        <result property="qualityPromote" column="quality_promote"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findUpdate" resultMap="updateMap">
+        select id , department , type , amount , round("numeric"(source_hold)/"numeric"(1),3)source_hold ,
+         round("numeric"(optimize_hold)/"numeric"(1),3) optimize_hold,
+         round("numeric"(quality_promote)/"numeric"(1),3)quality_promote from "DAMA"."dm".quality_update;
+    </select>
+
+    <resultMap id="reportMap" type="com.kxj.bigscreen.model.QualityReport">
+        <id property="id" column="id"></id>
+        <result property="serverDepartment" column="server_department"></result>
+        <result property="reportName" column="report_name"></result>
+        <result property="itemName" column="item_name"></result>
+        <result property="contractor" column="contractor"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="findReport" resultMap="reportMap">
+        select id , server_department , report_name , item_name , contractor , create_time , update_time
+        from "DAMA"."dm".quality_report;
+    </select>
+    
+    <resultMap id="boardMap" type="com.kxj.bigscreen.model.ProblemBoard">
+        <result property="type" column="type"></result>
+        <result property="total" column="total"></result>
+        <collection property="boardAmount" javaType="java.util.List" resultMap="board"></collection>
+    </resultMap>
+
+    <resultMap id="board" type="com.kxj.bigscreen.model.BoardAmount">
+        <result property="dataSource" column="data_source"></result>
+        <result property="dataAmount" column="data_amount"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="repetition" resultMap="boardMap">
+        select type , data_source , data_amount  from "DAMA"."dm".problem_board where type='重复';
+    </select>
+    <select id="repetAmount" resultType="java.lang.Integer">
+        select sum(data_amount) from "DAMA"."dm".problem_board where type='重复';
+    </select>
+
+    <select id="nullValue" resultMap="boardMap">
+        select type , data_source , data_amount  from "DAMA"."dm".problem_board where type='空值';
+    </select>
+    <select id="nullValueAmount" resultType="java.lang.Integer">
+        select sum(data_amount) from "DAMA"."dm".problem_board where type='空值';
+    </select>
+    <select id="example" resultMap="boardMap">
+        select type , data_source , data_amount  from "DAMA"."dm".problem_board where type='样例填充';
+    </select>
+    <select id="exampleAmount" resultType="java.lang.Integer">
+        select sum(data_amount) from "DAMA"."dm".problem_board where type='样例填充';
+    </select>
+    <select id="format" resultMap="boardMap">
+        select type , data_source , data_amount , hold from "DAMA"."dm".problem_board where type='格式错误';
+    </select>
+    <select id="formatAmount" resultType="java.lang.Integer">
+        select sum(data_amount) from "DAMA"."dm".problem_board where type='格式错误';
+    </select>
+    <select id="master" resultMap="boardMap">
+        select type , data_source , data_amount , hold from "DAMA"."dm".problem_board where type='逻辑错误';
+    </select>
+    <select id="masterAmount" resultType="java.lang.Integer">
+        select sum(data_amount) from "DAMA"."dm".problem_board where type='逻辑错误';
+    </select>
+    <select id="code" resultMap="boardMap">
+        select type , data_source , data_amount , hold from "DAMA"."dm".problem_board where type='超出编码范围';
+    </select>
+    <select id="codeAmount" resultType="java.lang.Integer">
+        select sum(data_amount) from "DAMA"."dm".problem_board where type='超出编码范围';
+    </select>
+    <select id="islet" resultMap="boardMap">
+        select type , data_source , data_amount , hold from "DAMA"."dm".problem_board where type='孤岛数据';
+    </select>
+    <select id="isletAmount" resultType="java.lang.Integer">
+        select sum(data_amount) from "DAMA"."dm".problem_board where type='孤岛数据';
+    </select>
+
+
+    <resultMap id="timeup" type="com.kxj.bigscreen.model.Time">
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <select id="time" resultMap="timeup">
+        select update_time from "DAMA"."dm".problem_board order by update_time desc limit 1
+    </select>
+</mapper>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.MasterDataDao">
+
+
+    <select id="personAll" resultType="com.kxj.bigscreen.entity.Person1">
+        select
+         id,
+         idcard_real,
+         idcard,
+         name ,
+         sex ,
+         telephone,domicile,
+         present_address,
+         rpr_address
+        from "DAMA"."di".dataserv_personal_label
+    </select>
+
+    <select id="person" resultType="com.kxj.bigscreen.entity.Person1">
+        select
+        id,
+        idcard,
+            name ,
+         sex ,
+         telephone,domicile,
+         present_address,
+         rpr_address
+        from "DAMA"."di".dataserv_personal_label
+        where idcard_real like CONCAT('%',#{parameter},'%')
+    </select>
+
+    <select id="personName" resultType="com.kxj.bigscreen.entity.Person1">
+        select
+        id,
+        idcard,
+        name ,
+        sex ,
+        telephone,domicile,
+        present_address,
+        rpr_address
+        from "DAMA"."di".dataserv_personal_label
+        where name_real like CONCAT('%',#{parameter},'%')
+    </select>
+
+    <select id="personInfo" resultType="com.kxj.bigscreen.entity.PersonInfo">
+        SELECT
+        b.COLUMN_NAME,
+	b.column_note,
+	A.value
+FROM
+	( SELECT * FROM json_each_text ( ( SELECT row_to_json ( T ) json1 FROM
+	(
+	 SELECT
+        *	  FROM "DAMA"."di".dataserv_personal_label T
+	 <where>
+        <if test="id != null and id !=''">
+            and  id=#{id}
+        </if>
+     </where>
+	 ) T ) ) )
+	A JOIN (
+	SELECT
+	    A.attname COLUMN_NAME,
+		d.description column_note
+	FROM
+		pg_class C,
+		pg_attribute A,
+		pg_description d
+	WHERE
+		A.attnum > 0
+		AND C.relname = 'dataserv_personal_label'
+		AND A.attrelid = C.oid
+		AND d.objoid = A.attrelid
+		AND d.objsubid = A.attnum
+	ORDER BY
+		C.relname DESC,
+	A.attnum ASC
+	) b ON A.KEY = b.COLUMN_NAME
+    </select>
+
+    <select id="legalAll" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+    </select>
+
+    <select id="legal" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+        where  uni_scid like CONCAT('%',#{parameter},'%')
+    </select>
+
+    <select id="legalCompany" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+        where  ent_name like CONCAT('%',#{parameter},'%')
+    </select>
+
+    <select id="legalPeopel" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+        where  legal_represent like CONCAT('%',#{parameter},'%')
+    </select>
+
+    <select id="legalMoney" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+        where  registered_capital >=#{parameter}
+        order by registered_capital
+    </select>
+
+    <select id="legalMoneyNopar" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+        order by registered_capital desc
+    </select>
+
+    <select id="legalEntType" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+        where ent_type=#{parameter}
+    </select>
+
+    <select id="legalInfo" resultType="com.kxj.bigscreen.entity.PersonInfo">
+        SELECT
+        b.COLUMN_NAME,
+        b.column_note,
+        A.value
+        FROM
+        ( SELECT * FROM json_each_text ( ( SELECT row_to_json ( T ) json1 FROM
+        (
+        SELECT * FROM "DAMA"."di".legalperson_info_uni T
+        <where>
+            <if test="uniScid != null and uniScid !=''">
+              uni_scid=#{uniScid}
+            </if>
+        </where>
+        ) T ) ) )
+        A JOIN (
+        SELECT A.attname COLUMN_NAME,
+        d.description column_note
+        FROM
+        pg_class C,
+        pg_attribute A,
+        pg_description d
+        WHERE
+        A.attnum > 0
+        AND C.relname = 'legalperson_info_uni'
+        AND A.attrelid = C.oid
+        AND d.objoid = A.attrelid
+        AND d.objsubid = A.attnum
+        ORDER BY
+        C.relname DESC,
+        A.attnum ASC
+        ) b ON A.KEY = b.COLUMN_NAME
+    </select>
+
+
+    <select id="api" resultType="com.kxj.bigscreen.entity.ApiInfo">
+        select api_id , api_name , api_state , api_method , api_explain ,api_count , api_object from "DAMA"."dm".api_info order by api_id
+    </select>
+</mapper>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.GovernDao">
+
+
+   <select id="tableName" resultType="com.kxj.bigscreen.entity.Department">
+       select department_id , department from "DAMA"."dm".dataman_department order by department_id
+   </select>
+    <select id="getInfo" resultType="com.kxj.bigscreen.model.CollectCondition">
+SELECT
+part1.department_id,
+ part2.department,
+ part1.data_item,
+ part1.amount,
+part1.join_date
+FROM
+ ( SELECT department_id, data_item, amount ,join_date ,
+ ROW_NUMBER() OVER(PARTITION by (department_id) ORDER BY "update_time" DESC) AS rw
+ FROM "DAMA"."dm".dataman_collect_condition ) part1
+ LEFT JOIN "DAMA"."dm".dataman_department part2 ON part1.department_id = part2.department_id where part1.rw=1 and part1.department_id=#{departmentId}
+    </select>
+
+	<resultMap id="chartMap" type="com.kxj.bigscreen.model.CharMap">
+		<result property="department" column="department"></result>
+		<result property="departmentId" column="department_id"></result>
+		<collection property="chart" javaType="java.util.List" resultMap="chart"></collection>
+	</resultMap>
+	<resultMap id="chart" type="com.kxj.bigscreen.model.Chart">
+		<result property="amount" column="amount"></result>
+		<result property="updateTime" column="update_time"></result>
+	</resultMap>
+	<select id="findLine" resultMap="chartMap">
+        SELECT
+ part2.department_id,
+ b.department,
+ part2.amount,
+  part2.date_id update_time
+FROM
+ (
+ SELECT
+  department_id,
+  amount,
+  month_tmp,
+  date_id,
+  ROW_NUMBER ( ) OVER ( PARTITION BY department_id, month_tmp ORDER BY date_id DESC ) rn
+ FROM
+  (
+  SELECT
+   temp1.department_id,
+   temp1.amount,
+   temp1.date_id,
+   temp1.month_tmp
+  FROM
+   ( SELECT department_id, amount, date_id, substr( update_time :: VARCHAR, 0, 8 ) AS month_tmp FROM "DAMA"."dm".dataman_collect_condition
+    WHERE date_id IS NOT NULL ) temp1
+   right JOIN (
+   SELECT
+    substr( date_id :: VARCHAR, 0, 8 ) AS month_tmp
+   FROM
+    "DAMA"."dm".dataman_collect_condition WHERE date_id IS NOT NULL
+   GROUP BY
+    month_tmp
+   ORDER BY
+    month_tmp DESC
+    LIMIT 6
+   ) temp2 ON temp1.month_tmp = temp2.month_tmp
+
+  ) part1
+ ) part2,
+ "DAMA"."dm".dataman_department b
+WHERE
+ rn = 1
+ AND part2.department_id = b.department_id
+ORDER BY
+ department_id,
+ date_id
+
+    </select>
+    
+    <select id="findAmount" resultType="com.kxj.bigscreen.model.DataCollect">
+        select source_amount , table_amount , item_amount , round(data_amount/10000.00,0) data_amount from "DAMA"."dm".dataman_data_collect
+        order by date_id desc limit 1
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.CompanyNewDao">
+
+
+    <select id="state" resultType="com.kxj.bigscreen.entity.DataviewLegalState">
+       select sum(normal_cnt) normal_cnt,sum(revoke_cnt) revoke_cnt,
+        sum(cancel_cnt) cancel_cnt,
+        sum(other_cnt) other_cnt from "DAMA"."dm".dataview_legal_street_ent_state
+        where
+        date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_legal_street_ent_state
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+
+        </where>
+
+    </select>
+
+    <select id="time" resultType="com.kxj.bigscreen.entity.DataviewLegalState">
+          SELECT distinct
+    substr( date_id :: VARCHAR, 0, 8 ) AS date_id
+   FROM
+    "DAMA"."dm".dataview_legal_street_ent_state
+   GROUP BY
+    date_id
+   ORDER BY
+    date_id DESC
+
+    </select>
+
+    <select id="comArea" resultType="com.kxj.bigscreen.entity.DataviewLegalState">
+        select street , normal_cnt , abnormal_cnt , revoke_cnt,
+        cancel_cnt,
+        other_cnt from "DAMA"."dm".dataview_legal_street_ent_state
+        where
+        date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_legal_street_ent_state
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+
+        </where>
+    </select>
+
+    <select id="industry" resultType="com.kxj.bigscreen.entity.DataviewLegalIndustry">
+        select industry_code , data_count from "DAMA"."dm".dataview_legal_industry_code
+        where
+        date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_legal_industry_code
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+
+        </where>
+        group by industry_code , data_count order by data_count desc limit 6
+    </select>
+
+
+    <select id="economic" resultType="com.kxj.bigscreen.entity.DataviewLegalEconomic">
+        select economic_code , data_count from "DAMA"."dm".dataview_legal_economic_code
+        where
+        date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_legal_economic_code
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+
+        </where>
+        group by economic_code , data_count order by data_count desc limit 6
+    </select>
+
+
+    <select id="unusual" resultType="com.kxj.bigscreen.entity.Unusual">
+        select c.year , a.company_own_tax,b.company_illegal_info,c.company_abnormal_info from (
+        select  year , data_count company_own_tax  from "DAMA"."dm".dataview_legal_company_unusual
+        where
+        name='company_own_tax' and date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_legal_company_unusual
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+
+        </where>
+         )a LEFT JOIN
+        (select  year , data_count company_illegal_info  from "DAMA"."dm".dataview_legal_company_unusual
+
+        where
+        name='company_illegal_info' and date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_legal_company_unusual
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+
+        </where>) b ON
+        a.year=b.year RIGHT JOIN
+        (select  year , data_count company_abnormal_info  from "DAMA"."dm".dataview_legal_company_unusual
+        where
+        name='company_abnormal_info' and date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_legal_company_unusual
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+
+        </where>
+         ) c
+        on a.year=c.year
+
+    </select>
+
+
+</mapper>

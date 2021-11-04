@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.PersonDao">
+
+    <resultMap id="personMap" type="com.kxj.bigscreen.model.Person">
+        <id property="personId" column="person_id"></id>
+        <result property="department" column="department"></result>
+        <result property="idCard" column="idcard"></result>
+        <result property="name" column="name"></result>
+        <result property="sex" column="sex"></result>
+        <result property="nationality" column="nationality"></result>
+        <result property="birthDate" column="birthdate"></result>
+        <result property="eduLevel" column="edulevel"></result>
+        <result property="polity" column="polity"></result>
+        <result property="marriageType" column="marriage_type"></result>
+        <result property="rprAddress" column="rpr_address"></result>
+        <result property="presentAddress" column="present_address" ></result>
+        <result property="rprStatus" column="rpr_status"></result>
+        <result property="updateTime" column="update_time"></result>
+        <result property="dataVersion" column="data_version"></result>
+    </resultMap>
+    <!--查询人口库信息-->
+    <select id="findPerson" resultMap="personMap" >
+        select person_id , idCard  ,
+         name ,
+        sex , nationality , birthdate ,edulevel , polity , marriage_type ,
+        rpr_address , present_address , rpr_status , update_time
+        from "DAMA"."dm".main_person_pri1
+        <where>
+            <if test="idCard != null and idCard !=''">
+                idCard=#{idCard};
+            </if>
+        </where>
+    </select>
+
+    <!--查询民政信息-->
+    <select id="findMZ" resultMap="personMap" >
+        select idCard  ,
+        name , sex , nationality ,
+        birthdate , edulevel , polity , marriage_type ,
+        rpr_address , present_address ,
+        rpr_status , update_time
+        from "DAMA"."dm".mz_mid_basic
+        <where>
+            <if test="idCard != null and idCard !=''">
+                idCard=#{idCard};
+            </if>
+        </where>
+    </select>
+
+    <!--查询残联信息-->
+    <select id="findCL" resultMap="personMap" >
+        select idCard  ,
+        name , sex , nationality ,
+        birthdate , edulevel , polity , marriage_type ,
+        rpr_address , present_address ,
+        update_time
+        from "DAMA"."dm".cl_mid_basic
+        <where>
+            <if test="idCard != null and idCard !=''">
+                idCard=#{idCard};
+            </if>
+        </where>
+    </select>
+    <!--查询西长安街信息-->
+    <select id="findXCAJ" resultMap="personMap" >
+        select idCard  ,
+        name , sex , nationality ,
+        birthdate , edulevel , polity , marriage_type ,
+        rpr_address , present_address ,
+         update_time
+        from "DAMA"."dm".xcaj_mid_basic
+        <where>
+            <if test="idCard != null and idCard !=''">
+                idCard=#{idCard};
+            </if>
+        </where>
+    </select>
+    <!--查询流管信息-->
+    <select id="findLG" resultMap="personMap" >
+        select idCard  ,
+        name , sex , nationality ,
+        birthdate , edulevel , polity , marriage_type ,
+        rpr_address , present_address ,
+        update_time
+        from "DAMA"."dm".lg_mid_basic
+        <where>
+            <if test="idCard != null and idCard !=''">
+                idCard=#{idCard};
+            </if>
+        </where>
+    </select>
+    <!--查询卫建信息-->
+    <select id="findWj" resultMap="personMap" >
+        select idCard  ,
+        name , sex , nationality ,
+        birthdate , edulevel , polity , marriage_type ,
+         present_address ,
+       update_time
+        from "DAMA"."dm".wj_mid_basic
+        <where>
+            <if test="idCard != null and idCard !=''">
+                idCard=#{idCard};
+            </if>
+        </where>
+    </select>
+    <!--查询历史信息-->
+    <select id="findVersionAll" resultMap="personMap" >
+        select idCard  ,
+        name , sex , nationality ,
+        birthdate , edulevel , polity , marriage_type ,
+        rpr_address , present_address , rpr_status ,
+         update_time , data_version
+        from "DAMA"."dm".main_person_pri1_history
+        <where>
+            <if test="idCard != null and idCard !=''">
+                idCard=#{idCard}
+            </if>
+            <if test="dataVersion != null and dataVersion !=''">
+                and data_version &lt;=#{dataVersion}
+            </if>
+        </where>
+        order by data_version limit 4
+    </select>
+
+    <resultMap id="metaMap" type="com.kxj.bigscreen.model.Meta">
+        <id property="id" column="id"></id>
+        <result property="metaType" column="meta_type"></result>
+        <result property="cnName" column="cn_name"></result>
+        <result property="enName" column="en_name"></result>
+        <result property="internalIdentifier" column="internal_identifier"></result>
+        <result property="cnTranslate" column="cn_translate"></result>
+        <result property="cnTranslateAbbr" column="cn_translate_abbr"></result>
+        <result property="illustrate" column="illustrate"></result>
+        <result property="denote" column="denote"></result>
+        <result property="dataType" column="data_type"></result>
+        <result property="domain" column="domain"></result>
+        <result property="submitInstitutions" column="submit_institutions"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+    <!--查询人口库元数据信息-->
+    <select id="findMeta" resultMap="metaMap">
+        select distinct id , cn_name , internal_identifier,  domain ,
+         submit_institutions from "DAMA"."dm".meta
+        <where>
+            <if test="metaType != null and metaType !=''">
+                meta_type=#{metaType}
+            </if>
+        </where>
+        order by id
+    </select>
+    
+    <select id="findMetaDetail" resultMap="metaMap">
+        select distinct cn_name , en_name , internal_identifier, cn_translate , cn_translate_abbr ,
+        illustrate , denote , data_type , data_format , domain ,
+       submit_institutions from "DAMA"."dm".meta
+        <where>
+            <if test="metaType != null and metaType !=''">
+                meta_type=#{metaType}
+            </if>
+            <if test="cnName != null and cnName !='' ">
+                and cn_name=#{cnName};
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>

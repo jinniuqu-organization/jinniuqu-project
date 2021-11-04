@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.CollectNewDao">
+
+
+   <select id="tableName" resultType="com.kxj.bigscreen.entity.TableInfo">
+       select table_id , table_name ,table_note from "DAMA"."dm".datacollect_tableinfo order by table_id
+   </select>
+    <select id="getInfo" resultType="com.kxj.bigscreen.entity.DatacollectGeneralInfo">
+        select table_id ,table_type , depart_name , table_note , update_cycle , data_range , data_count from
+        "DAMA"."dm".datacollect_general_info where date_id =
+        (select max(date_id) from "DAMA"."dm".datacollect_general_info)
+		 order by date_id , table_id
+    </select>
+    <resultMap id="chartMap" type="com.kxj.bigscreen.entity.CharMap">
+		<result property="tableId" column="table_id"></result>
+        <result property="tableNote" column="table_note"></result>
+        <collection property="chart" javaType="java.util.List" resultMap="chart"></collection>
+    </resultMap>
+    <resultMap id="chart" type="com.kxj.bigscreen.entity.Chart">
+        <result property="dataTotal" column="data_total"></result>
+        <result property="dateId" column="date_id"></result>
+    </resultMap>
+    <select id="findLine" resultMap="chartMap">
+        SELECT
+		part2.table_note,
+		part2.table_id,
+		part2.data_total,
+		part2.date_id
+	FROM
+	(
+	SELECT
+	table_id,
+		table_note,
+		data_total,
+		month_tmp,
+		date_id,
+		ROW_NUMBER ( ) OVER ( PARTITION BY table_id, month_tmp ORDER BY date_id DESC ) rn
+	FROM
+		(
+	SELECT
+	temp1.table_id,
+			temp1.table_note,
+			temp1.data_total,
+			temp1.date_id,
+			temp1.month_tmp
+		FROM
+			( SELECT
+	table_note,
+	table_id,
+	data_total,
+	date_id,
+	substr( date_id :: VARCHAR, 0, 8 ) AS month_tmp
+FROM
+	"DAMA"."dm".datacollect_update
+WHERE
+	date_id IS NOT NULL) temp1
+			RIGHT JOIN (
+			SELECT
+				substr( date_id :: VARCHAR, 0, 8 ) AS month_tmp
+			FROM
+				"DAMA"."dm".datacollect_update
+			WHERE
+				date_id IS NOT NULL
+			GROUP BY
+				month_tmp
+			ORDER BY
+				month_tmp DESC
+				LIMIT 6
+			) temp2 ON temp1.month_tmp = temp2.month_tmp
+			) part1
+	) part2 where rn=1
+	ORDER BY
+	date_id, table_id
+
+    </select>
+    <resultMap id="dataUpdateMap" type="com.kxj.bigscreen.entity.DataUpdateCondition">
+        <result property="dataUpdate" column="data_update"></result>
+        <result property="dateId" column="date_id"></result>
+    </resultMap>
+
+    <resultMap id="dataUpdate" type="com.kxj.bigscreen.entity.DataUpdate">
+		<result property="tableId" column="table_id"></result>
+        <result property="tableNote" column="table_note"></result>
+        <collection  property="dataUpdateCondition" javaType="java.util.List" resultMap="dataUpdateMap" />
+    </resultMap>
+    <select id="findUpdate" resultMap="dataUpdate">
+        	SELECT
+		part2.table_note,
+		part2.table_id,
+		part2.data_update,
+		part2.date_id
+	FROM
+	(
+	SELECT
+	table_id,
+		table_note,
+		data_update,
+		month_tmp,
+		date_id,
+		ROW_NUMBER ( ) OVER ( PARTITION BY table_id, month_tmp ORDER BY date_id DESC ) rn
+	FROM
+		(
+	SELECT
+	temp1.table_id,
+			temp1.table_note,
+			temp1.data_update,
+			temp1.date_id,
+			temp1.month_tmp
+		FROM
+			( SELECT
+	table_note,
+	table_id,
+	data_update,
+	date_id,
+	substr( date_id :: VARCHAR, 0, 8 ) AS month_tmp
+FROM
+	"DAMA"."dm".datacollect_update
+WHERE
+	date_id IS NOT NULL) temp1
+			RIGHT JOIN (
+			SELECT
+				substr( date_id :: VARCHAR, 0, 8 ) AS month_tmp
+			FROM
+				"DAMA"."dm".datacollect_update
+			WHERE
+				date_id IS NOT NULL
+			GROUP BY
+				month_tmp
+			ORDER BY
+				month_tmp DESC
+				LIMIT 6
+			) temp2 ON temp1.month_tmp = temp2.month_tmp
+			) part1
+	) part2 where rn=1 and table_id =#{tableId}
+	ORDER BY
+	date_id
+    </select>
+
+    
+    <select id="findAmount" resultType="com.kxj.bigscreen.entity.DatacollectGeneralService">
+        select date_id , depart_name , table_amount , item_amount , data_count ,link_amount from "DAMA"."dm".datacollect_general_service
+        order by date_id desc limit 1
+    </select>
+
+
+    <select id="findDocumentInfo" resultType="com.kxj.bigscreen.entity.Document">
+       select  table_id , table_note , "column" , column_note , code_state from "DAMA"."dm".datacollect_tablecolumninfo
+		<where>
+			<if test="tableId != null and tableId !=''">
+				table_id =#{tableId}
+			</if>
+		</where>
+
+    </select>
+
+	<select id="findDocument" resultType="com.kxj.bigscreen.entity.DatacollectDocument">
+		select table_id , word_type , status from "DAMA"."dm".datacollect_document order by table_id
+	</select>
+
+
+</mapper>

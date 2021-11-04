@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kxj.bigscreen.dao.PersonNewDao">
+
+    <select id="statistics" resultType="com.kxj.bigscreen.entity.DataviewPerArea">
+        select round(sum(total_cnt)/10000,0) total_cnt , round(sum(regiter_cnt)/10000,0) regiter_cnt ,
+        round(sum(actual_cnt)/10000,0) actual_cnt ,round(sum(float_cnt)/10000,0) float_cnt
+        from "DAMA"."dm".dataview_per_area where
+        date_id =
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_per_area
+        <where>
+            <if test="dateId != null and dateId !=''">
+             to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+    </where>
+    </select>
+
+    <select id="time" resultType="com.kxj.bigscreen.entity.DataviewPerArea">
+       SELECT distinct
+    substr( date_id :: VARCHAR, 0, 8 ) AS date_id
+   FROM
+    "DAMA"."dm".dataview_per_area
+   GROUP BY
+    date_id
+   ORDER BY
+    date_id DESC
+
+    </select>
+
+    <resultMap id="man" type="com.kxj.bigscreen.entity.DataviewPerAgeData">
+        <result property="ageRange" column="age_range"></result>
+        <result property="dataCount" column="data_count"></result>
+    </resultMap>
+
+    <resultMap id="sexMap" type="com.kxj.bigscreen.entity.DataviewPerAge">
+        <result property="name" column="name"></result>
+        <collection property="dataviewPerAgeData" javaType="java.util.List" resultMap="man"></collection>
+    </resultMap>
+    <select id="man" resultMap="sexMap" >
+        select '男性' as name ,  age_range , man_cnt data_count
+        from "DAMA"."dm".dataview_per_age
+        where
+        date_id =
+        (select distinct max(date_id)update_time from "DAMA"."dm".dataview_per_age
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+        </where> order by id
+    </select>
+
+    <select id="woman" resultMap="sexMap">
+        select  '女性' as name , age_range  , woman_cnt data_count
+        from "DAMA"."dm".dataview_per_age
+        where
+        date_id =
+        (select distinct max(date_id)update_time from "DAMA"."dm".dataview_per_age
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+        </where> order by id
+    </select>
+
+
+    <select id="perFloat" resultType="com.kxj.bigscreen.entity.DataviewPerFloat">
+        select float_reson , float_cnt from "DAMA"."dm".dataview_per_float
+         where
+        date_id =
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_per_float
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+        </where> ORDER BY float_cnt desc limit 5
+    </select>
+
+    <select id="jf" resultType="com.kxj.bigscreen.entity.DataviewPerJf">
+        select area_name , cast(zc_ratio*100 as FLOAT)as zc_ratio from "DAMA"."dm".dataview_per_jf
+        where
+        date_id =
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_per_jf
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+        </where>
+    </select>
+
+    <select id="ym" resultType="com.kxj.bigscreen.entity.DataviewPerYm">
+        select area_name , yyjz_cnt,wyjz_cnt from "DAMA"."dm".dataview_per_ym
+        where
+        date_id =
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_per_ym
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+        </where>
+    </select>
+
+
+    <select id="person" resultType="com.kxj.bigscreen.entity.DataviewPerArea">
+        select  area_id,area_name ,total_cnt  , regiter_cnt ,
+     actual_cnt , float_cnt from
+        "DAMA"."dm".dataview_per_area
+        where date_id=
+        (select distinct max(date_id)date_id from "DAMA"."dm".dataview_per_area
+        <where>
+            <if test="dateId != null and dateId !=''">
+                to_char(date_id, 'yyyy-MM-dd') like concat ('%',#{dateId},'%'))
+            </if>
+        </where>
+
+
+    </select>
+
+
+
+</mapper>
