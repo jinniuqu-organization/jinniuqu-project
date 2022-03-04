@@ -5,17 +5,19 @@ import com.kxj.bigscreen.entity.*;
 import java.util.List;
 
 /**
- * @Author: wangxiaogang
- * @Date: 2019/12/26 15:38
- * @Version 1.0
+ * @Author: Leetao
+ * @Date: 2021/09/26 15:39
+ * @Version 2.0
  */
 public interface MasterDataService {
     //查询所有人口
     List<Person1> personAll(Person1 data);
-
+    //身份证号查询
     List<Person1> person(Person1 data);
     //模糊查询姓名
     List<Person1> personName(Person1 data);
+    //模糊查询街道
+    List<Person1> personStreet(Person1 data);
 
     List<PersonInfo> personInfo(Integer id);
 
@@ -35,6 +37,8 @@ public interface MasterDataService {
     List<LegalPerson> legalMoneyNopar();
 
     List<PersonInfo> legalInfo(String uniScid);
+    //模糊查询所属市管理所
+    List<LegalPerson> legalManagement(LegalPerson data);
 
     //接口服务
     List<ApiInfo> api();

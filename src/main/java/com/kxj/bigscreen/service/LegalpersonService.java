@@ -1,6 +1,7 @@
 package com.kxj.bigscreen.service;
 
 
+import com.kxj.bigscreen.entity.LegalPerson;
 import com.kxj.bigscreen.model.Legalperson;
 import com.kxj.bigscreen.model.LegalpersonStatus;
 
@@ -30,5 +31,11 @@ public interface LegalpersonService {
      */
     List<Legalperson> findVersion(Legalperson legalperson);
 
+    /**
+     * api测试
+     * @param page1,pagesize1
+     * @return
+     */
+    List<LegalPerson> getAll(Integer page1, Integer pagesize1);
 
 }

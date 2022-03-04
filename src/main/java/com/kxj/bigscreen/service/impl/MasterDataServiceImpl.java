@@ -12,9 +12,9 @@ import javax.annotation.Resource;
 import java.util.*;
 
 /**
- * @Author: wangxiaogang
- * @Date: 2019/12/26 15:39
- * @Version 1.0
+ * @Author: Leetao
+ * @Date: 2021/09/26 15:39
+ * @Version 2.0
  */
 @Service
 @Slf4j
@@ -39,6 +39,12 @@ public class MasterDataServiceImpl implements MasterDataService {
     @Override
     public List<Person1> personName(Person1 data) {
         List<Person1> list = masterDataDao.personName(data);
+        return list;
+    }
+
+    @Override
+    public List<Person1> personStreet(Person1 data) {
+        List<Person1> list = masterDataDao.personStreet(data);
         return list;
     }
 
@@ -91,10 +97,17 @@ public class MasterDataServiceImpl implements MasterDataService {
     }
 
     @Override
+    public List<LegalPerson> legalManagement(LegalPerson data) {
+        List<LegalPerson> list = masterDataDao.legalManagement(data);
+        return list;
+    }
+
+    @Override
     public List<PersonInfo> legalInfo(String uniScid) {
         List<PersonInfo> data = masterDataDao.legalInfo(uniScid);
         return data;
     }
+
 
     @Override
     public List<ApiInfo> api() {

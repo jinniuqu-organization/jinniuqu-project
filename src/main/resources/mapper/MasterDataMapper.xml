@@ -42,6 +42,19 @@
         where name_real like CONCAT('%',#{parameter},'%')
     </select>
 
+    <select id="personStreet" resultType="com.kxj.bigscreen.entity.Person1">
+        select
+        id,
+        idcard,
+        name ,
+        sex ,
+        telephone,domicile,
+        present_address,
+        rpr_address
+        from "DAMA"."di".dataserv_personal_label
+        where own_street like CONCAT('%',#{parameter},'%')
+    </select>
+
     <select id="personInfo" resultType="com.kxj.bigscreen.entity.PersonInfo">
         SELECT
         b.COLUMN_NAME,
@@ -101,6 +114,12 @@ FROM
         where  legal_represent like CONCAT('%',#{parameter},'%')
     </select>
 
+    <select id="legalManagement" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+        select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
+        from "DAMA"."di".legalperson_info_uni
+        where  reg_institute like CONCAT('%',#{parameter},'%')
+    </select>
+
     <select id="legalMoney" resultType="com.kxj.bigscreen.entity.LegalPerson" >
         select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
         from "DAMA"."di".legalperson_info_uni
@@ -114,7 +133,7 @@ FROM
         order by registered_capital desc
     </select>
 
-    <select id="legalEntType" resultType="com.kxj.bigscreen.entity.LegalPerson" >
+    <select id=" " resultType="com.kxj.bigscreen.entity.LegalPerson" >
         select uni_scid , ent_name , reg_address , legal_represent , tel , ent_state ,registered_capital,ent_type
         from "DAMA"."di".legalperson_info_uni
         where ent_type=#{parameter}

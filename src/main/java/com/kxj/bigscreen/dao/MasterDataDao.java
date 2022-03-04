@@ -14,8 +14,10 @@ public interface MasterDataDao {
 
     //查询所有
     List<Person1> personAll(Person1 data);
-
+    //身份证号查询
     List<Person1> person(Person1 data);
+    //模糊查询街道
+    List<Person1> personStreet(Person1 data);
 
     List<Person1> personName(Person1 data);
 
@@ -37,7 +39,8 @@ public interface MasterDataDao {
     List<LegalPerson> legalMoneyNopar();
 
     List<PersonInfo> legalInfo(String uniScid);
-
+    //模糊查询所属市管理所
+    List<LegalPerson> legalManagement(LegalPerson data);
 
     //接口服务
     List<ApiInfo> api();

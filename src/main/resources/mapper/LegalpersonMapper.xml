@@ -163,4 +163,10 @@
             </if>
         </where>
     </select>
+
+
+    <select id="getAll"  resultType="com.kxj.bigscreen.entity.excelsfz">
+        select *  from "DAMA"."source".escel_sfz6
+        limit #{pagesize1}
+    </select>
 </mapper>

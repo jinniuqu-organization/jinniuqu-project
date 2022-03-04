@@ -1,6 +1,7 @@
 package com.kxj.bigscreen.dao;
 
 
+import com.kxj.bigscreen.entity.LegalPerson;
 import com.kxj.bigscreen.model.Legalperson;
 
 import java.util.List;
@@ -34,6 +35,9 @@ public interface LegalpersonDao {
      * @return
      */
     List<Legalperson> findVersion(Legalperson legalperson);
+
+    //api测试
+    List<LegalPerson> getAll(Integer page1, Integer pagesize1);
 
 
 }

@@ -1,6 +1,7 @@
 package com.kxj.bigscreen.service.impl;
 
 import com.kxj.bigscreen.dao.LegalpersonDao;
+import com.kxj.bigscreen.entity.LegalPerson;
 import com.kxj.bigscreen.model.Legalperson;
 import com.kxj.bigscreen.model.LegalpersonStatus;
 import com.kxj.bigscreen.service.LegalpersonService;
@@ -54,6 +55,12 @@ public class LegalpersonServiceImpl implements LegalpersonService {
     @Override
     public List<Legalperson> findVersion(Legalperson legalperson) {
         List<Legalperson> list = legalpersonDao.findVersion(legalperson);
+        return list;
+    }
+
+    @Override
+    public List<LegalPerson> getAll(Integer page1, Integer pagesize1) {
+        List<LegalPerson> list = legalpersonDao.getAll(page1,pagesize1);
         return list;
     }
 

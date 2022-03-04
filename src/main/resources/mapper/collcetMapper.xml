@@ -181,7 +181,7 @@ ORDER BY
         <result property="updateTime" column="update_time"></result>
     </resultMap>
     <select id="time" resultType="com.kxj.bigscreen.model.Time">
-        select date_id update_time from "DAMA"."dm".dm_table_updatetime
+        select date(now()) update_time from "DAMA"."dm".dm_table_updatetime
         <where>
             <if test="screenId != null and screenId !=''">
                 screen_id =#{screenId}

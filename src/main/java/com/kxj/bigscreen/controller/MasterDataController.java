@@ -11,18 +11,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * @Author: wangxiaogang
- * @Date: 2019/12/26 15:25
- * @Version 1.0
+ * @Author: Leetao
+ * @Date: 2021/09/26 15:39
+ * @Version 2.0
  */
 @RestController
 @Slf4j
@@ -77,6 +74,17 @@ public class MasterDataController {
                 if (!CollectionUtils.isEmpty(list)) {
                     PageInfo<Person1> pageInfo = new PageInfo<>(list);
                     return new AjaxResponse(200, "模糊查询姓名人口信息", pageInfo);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }else if(data.getType().equals("3")&&data.getParameter()!=""){
+            try {
+
+                List<Person1> list = masterDataService.personStreet(data);
+                if (!CollectionUtils.isEmpty(list)) {
+                    PageInfo<Person1> pageInfo = new PageInfo<>(list);
+                    return new AjaxResponse(200, "模糊查询街道人口信息", pageInfo);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -208,6 +216,17 @@ public class MasterDataController {
                 if (!CollectionUtils.isEmpty(list)) {
                     PageInfo<LegalPerson> pageInfo = new PageInfo<>(list);
                     return new AjaxResponse(200, "法人信息企业类型查询成功", pageInfo);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }else if(data.getType().equals("6") && data.getParameter()!=""){
+            try{
+                log.info("管理所为####"+data.getParameter());
+                List<LegalPerson> list = masterDataService.legalManagement(data);
+                if (!CollectionUtils.isEmpty(list)) {
+                    PageInfo<LegalPerson> pageInfo = new PageInfo<>(list);
+                    return new AjaxResponse(200, "法人信息所属管理所查询成功", pageInfo);
                 }
             }catch (Exception e){
                 e.printStackTrace();
